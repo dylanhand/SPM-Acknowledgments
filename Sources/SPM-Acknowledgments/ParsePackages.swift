@@ -40,7 +40,7 @@ internal class ParsePackages {
             return []
         }
         json.pins.forEach { print($0) }
-        return json.pins.filter({ $0.name != "SPM-Acknowledgments" && !$0.licenseURLMain.absoluteString.contains(".git/") })
+        return json.pins.filter({ !$0.licenseURLMain.absoluteString.contains(".git/") })
 	}
 }
 
