@@ -22,7 +22,7 @@ final public class AcknowledgmentsTableViewController: UITableViewController {
 		tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
 		footerView.frame.size = footerView.systemLayoutSizeFitting(CGSize(width: view.frame.width, height: .greatestFiniteMagnitude),
 																	 withHorizontalFittingPriority: .defaultHigh, verticalFittingPriority: .defaultLow)
-		tableView.tableFooterView = footerView
+//		tableView.tableFooterView = footerView
 	}
 	
 	override public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
