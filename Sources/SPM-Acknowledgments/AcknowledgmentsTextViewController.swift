@@ -56,7 +56,8 @@ internal class AcknowledgmentsTextViewController: UIViewController {
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
-        package.fetchLicense { licenseText in
+        Task {
+            let licenseText = await package.fetchLicense()
             DispatchQueue.main.async {
                 self.textView.text = licenseText ?? "No license found."
                 self.loadingSpinner.stopAnimating()

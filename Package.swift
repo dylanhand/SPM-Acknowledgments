@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SPM-Acknowledgments",
-	platforms: [.iOS("11.0")],
+	platforms: [.iOS("15.0")],
     products: [
         .library(
             name: "SPM-Acknowledgments",
@@ -19,5 +19,5 @@ let package = Package(
             name: "SPM-AcknowledgmentsTests",
             dependencies: ["SPM-Acknowledgments"]),
 	],
-	swiftLanguageVersions: [.v4_2]
+	swiftLanguageVersions: [.v5]
 )

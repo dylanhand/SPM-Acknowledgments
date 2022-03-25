@@ -45,46 +45,42 @@ internal class ParsePackages {
 }
 
 extension Package {
-    typealias FetchLicenseCompletion = (String?) -> Void
-
-    func fetchLicense(_ completion: @escaping FetchLicenseCompletion) {
+    func fetchLicense() async -> String? {
         // First try to get the license from the `master` branch. If not found, use `main` branch.
-        let firstURLAttempt = licenseURLMaster
-        let secondURLAttempt = licenseURLMain
+        let licenseUrls = [
+            licenseURLMaster,
+            licenseURLMain,
+            licenseURLMaster.appendingPathExtension("md"),
+            licenseURLMain.appendingPathExtension("md")
+        ]
 
-        fetchLicense(at: firstURLAttempt) { license in
-            if let license = license {
-                completion(license)
-            } else {
-                fetchLicense(at: secondURLAttempt) { license in
-                    if let license = license {
-                        completion(license)
-                    } else {
-                        completion(nil)
-                    }
-                }
+        for url in licenseUrls {
+            if let license = await fetchLicense(at: url) {
+                return license
             }
         }
+
+        return nil
     }
 
-    private func fetchLicense(at url: URL, _ completion: @escaping FetchLicenseCompletion) {
-        let task = URLSession.shared.downloadTask(with: url) { localURL, urlResponse, error in
+    private func fetchLicense(at url: URL) async -> String? {
+        var taskResponse: (data: Data, response: URLResponse)
 
-            // The license should be plain text. If it's HTML, we probably got a 404 for using the wrong branch name.
-            let expectedMimeType = "text/plain"
-
-            guard
-                let mimeType = urlResponse?.mimeType,
-                mimeType == expectedMimeType,
-                let localURL = localURL,
-                let license = try? String(contentsOf: localURL)
-            else {
-                completion(nil)
-                return
-            }
-
-            completion(license)
+        do {
+            taskResponse = try await URLSession.shared.data(from: url)
+        } catch {
+            return nil
         }
-        task.resume()
+
+        guard taskResponse.response.mimeType == "text/plain" else {
+            // The license should be plain text. If it's HTML, we probably got a 404 for using the wrong branch name.
+            return nil
+        }
+
+        guard let license = String(data: taskResponse.data, encoding: .utf8) else {
+            return nil
+        }
+
+        return license
     }
 }
