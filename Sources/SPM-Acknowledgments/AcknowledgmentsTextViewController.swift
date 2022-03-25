@@ -56,14 +56,13 @@ internal class AcknowledgmentsTextViewController: UIViewController {
 	}
 	
 	override func viewDidAppear(_ animated: Bool) {
-		let task = URLSession.shared.downloadTask(with: package.licenseURL) { [weak self] localURL, urlResponse, error in
-			guard let self = self, let localURL = localURL else { return }
-			DispatchQueue.main.async {
-				self.textView.text = try? String(contentsOf: localURL)
-				self.loadingSpinner.stopAnimating()
-			}
-		}
-		task.resume()
+        Task {
+            let licenseText = await package.fetchLicense()
+            DispatchQueue.main.async {
+                self.textView.text = licenseText ?? "No license found."
+                self.loadingSpinner.stopAnimating()
+            }
+        }
 	}
 	
 	@available(*, unavailable)
