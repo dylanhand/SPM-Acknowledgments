@@ -39,8 +39,7 @@ internal class ParsePackages {
 			let json = try? JSONDecoder().decode(Pins.self, from: data) else {
             return []
         }
-        json.pins.forEach { print($0) }
-        return json.pins.filter({ !$0.licenseURLMain.absoluteString.contains(".git/") })
+        return json.pins.filter({ $0.name != "beckon-mesh-ios" && !$0.licenseURLMain.absoluteString.contains(".git/") })
 	}
 }
 
