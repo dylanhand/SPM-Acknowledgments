@@ -9,6 +9,19 @@
 import Foundation
 import SwiftUI
 
+// Removes ".git" from a url such as https://github.com/dylanhand/SPM-Acknowledgments.git
+func stripGitExtension(_ url: URL) -> URL {
+    let separator = "."
+    var components = url.absoluteString.components(separatedBy: separator)
+    if components.last == "git" {
+        components.removeLast()
+    }
+    guard let strippedURL = URL(string: components.joined(separator: separator)) else {
+        return url
+    }
+    return strippedURL
+}
+
 internal struct Package: Decodable {
 	let name: String
 	let licenseURLMain: URL
@@ -18,13 +31,14 @@ internal struct Package: Decodable {
 		case name = "identity"
 		case licenseURL = "location"
 	}
-	
+
 	init(from decoder: Decoder) throws {
 		let values = try decoder.container(keyedBy: CodingKeys.self)
 		name = try values.decode(String.self, forKey: .name)
 		let baseURL = try values.decode(URL.self, forKey: .licenseURL)
-		licenseURLMain = baseURL.appendingPathComponent("/raw/main/LICENSE")
-        licenseURLMaster = baseURL.appendingPathComponent("/raw/master/LICENSE")
+        let baseURLStripped = stripGitExtension(baseURL)
+		licenseURLMain = baseURLStripped.appendingPathComponent("/raw/main/LICENSE")
+        licenseURLMaster = baseURLStripped.appendingPathComponent("/raw/master/LICENSE")
 	}
 }
 
